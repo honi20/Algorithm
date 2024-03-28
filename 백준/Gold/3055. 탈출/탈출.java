@@ -84,9 +84,12 @@ public class Main {
 		boolean[][] isVisited = new boolean[rowSize][colSize];
 		
 		for (int idx = 0; idx < waters.size(); idx++) {
-			pq.add(new Node(waters.get(idx), 0, IS_WATER));
+			Point water = waters.get(idx);
+			pq.add(new Node(water, 0, IS_WATER));
+			isVisited[water.row][water.col] = true; 
 		}
 		pq.add(new Node(start, 0, IS_NOT_WATER));
+		isVisited[start.row][start.col] = true; 
 		
 		// 3-2. 빈 큐가 될 때까지 반복한다.
 		while (!pq.isEmpty()) {
@@ -99,11 +102,6 @@ public class Main {
 			// 3-2-1. 현재 좌표가 목적지라면, 시간 반환 후 종료
 			if (map[currentRow][currentCol] == DEST)
 				return currentTime;
-			
-			// 3-2-2. 현재 좌표가 이미 방문되었다면, 패스
-			if (isVisited[currentRow][currentCol])
-				continue;
-			isVisited[currentRow][currentCol] = true;
 
 			// 3-2-3. 인접 칸으로 이동
 			for (int dir = 0; dir < DELTA_CNT; dir++) {
@@ -127,6 +125,7 @@ public class Main {
 					continue;
 				
 				// 5) 큐에 추가
+				isVisited[nextRow][nextCol] = true; 
 				pq.offer(new Node(new Point(nextRow, nextCol), currentTime + 1, currentType));
 			}
 		}
