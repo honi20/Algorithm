@@ -2,11 +2,10 @@
  * 1. 지도의 세로, 가로 크기가 입력된다.
  * 2. 지도의 정보가 입력된다.
  * 3. 비버의 동굴(목적지)까지 가는데 걸리는 최소 시간을 구한다.
- * 	3-1. 큐를 생성하고 물 칸의 좌표와 시작 좌표를 큐에 추가한다.
+ * 	3-1. 큐를 생성하고 물 칸의 좌표와 시작 좌표를 큐에 추가한다. (시작 좌표보다 물칸의 좌표를 먼저!!)
  * 	3-2. 빈 큐가 될 때까지 반복한다.
  * 		3-2-1. 현재 좌표가 목적지라면, 시간 반환 후 종료
- * 		3-2-2. 현재 좌표가 이미 방문되었다면, 패스
- * 		3-2-3. 인접 칸으로 이동
+ * 		3-2-2. 인접 칸으로 이동
  * 			1) 범위를 벗어나는 경우, 패스
  * 			2) 이미 방문한 칸인 경우, 패스
  * 			3) 돌이 있는 칸인 경우, 패스
@@ -15,9 +14,10 @@
  */
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -36,24 +36,17 @@ public class Main {
 		}	
 	}
 	
-	// 큐에 넣을 정보 (시간이 작은게 앞으로, 시간이 같다면 물 칸이 앞으로 오도록 정렬됨)
-	static class Node implements Comparable<Node> { 
+	// 큐에 넣을 정보
+	static class Node { 
 		Point point;	// 좌표
 		int time;		// 출발지에서 현재 좌표까지 오는데 걸린 시간
-		int type;		// 칸의 타입 (물칸인지 여부 저장)
+		boolean isWater;
 		
-		public Node(Point point, int time, int type) {
+		public Node(Point point, int time, boolean isWater) {
 			super();
 			this.point = point;
 			this.time = time;
-			this.type = type;
-		}
-		
-		@Override
-		public int compareTo(Node o) {
-			if (this.time == o.time)
-				return this.type - o.type;
-			return this.time - o.time;
+			this.isWater = isWater;
 		}
 	}
 	
@@ -69,41 +62,37 @@ public class Main {
 	static final char DEST = 'D';
 	static final char START = 'S';
 	
-	// 각 칸이 방문된 시간에 칸의 상태가 물인지 아닌지의 값
-	static final int IS_WATER = 0;
-	static final int IS_NOT_WATER = 1;
-	
 	static int rowSize, colSize;	// 지도의 세로, 가로 크기
 	static int[][] map;				// 지도 정보
 	static Point start;				// 시작 좌표
 	static List<Point> waters;		// 물이 찬 좌표 정보 
 	
 	public static int goToDestination() {
-		// 3-1. 큐를 생성하고 물 칸의 좌표와 시작 좌표를 큐에 추가한다.
-		PriorityQueue<Node> pq = new PriorityQueue<>();
+		// 3-1. 큐를 생성하고 물 칸의 좌표와 시작 좌표를 큐에 추가한다. (시작 좌표보다 물칸의 좌표를 먼저!!)
+		Queue<Node> queue = new ArrayDeque<>();
 		boolean[][] isVisited = new boolean[rowSize][colSize];
 		
 		for (int idx = 0; idx < waters.size(); idx++) {
 			Point water = waters.get(idx);
-			pq.add(new Node(water, 0, IS_WATER));
+			queue.add(new Node(water, 0, true));
 			isVisited[water.row][water.col] = true; 
 		}
-		pq.add(new Node(start, 0, IS_NOT_WATER));
+		queue.add(new Node(start, 0, false));
 		isVisited[start.row][start.col] = true; 
 		
 		// 3-2. 빈 큐가 될 때까지 반복한다.
-		while (!pq.isEmpty()) {
-			Node node = pq.poll();
+		while (!queue.isEmpty()) {
+			Node node = queue.poll();
 			int currentRow = node.point.row;
 			int currentCol = node.point.col;
 			int currentTime = node.time;
-			int currentType = node.type;
+			boolean isWater = node.isWater;
 			
 			// 3-2-1. 현재 좌표가 목적지라면, 시간 반환 후 종료
 			if (map[currentRow][currentCol] == DEST)
 				return currentTime;
 
-			// 3-2-3. 인접 칸으로 이동
+			// 3-2-2. 인접 칸으로 이동
 			for (int dir = 0; dir < DELTA_CNT; dir++) {
 				int nextRow = currentRow + DELTA_ROW[dir];
 				int nextCol = currentCol + DELTA_COL[dir];
@@ -121,12 +110,12 @@ public class Main {
 					continue;
 				
 				// 4) 현재 칸이 물 칸이고 인접 칸이 동굴인 경우, 패스
-				if (currentType == IS_WATER && map[nextRow][nextCol] == DEST)
+				if (isWater && map[nextRow][nextCol] == DEST)
 					continue;
 				
-				// 5) 큐에 추가
+				// 5) 방문 처리 후 큐에 추가
 				isVisited[nextRow][nextCol] = true; 
-				pq.offer(new Node(new Point(nextRow, nextCol), currentTime + 1, currentType));
+				queue.offer(new Node(new Point(nextRow, nextCol), currentTime + 1, isWater));
 			}
 		}
 		return -1;
