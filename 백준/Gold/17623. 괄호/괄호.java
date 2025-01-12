@@ -7,13 +7,29 @@ public class Main {
 	static StringTokenizer st;
 
 	static final int MAX = 1000;
-	static final int[] PARENTHESES = {1,2};
-	static final int[] CURLY = {3,4};
-	static final int[] SQUARE = {5,6};
+	static final int LEFT = 0;
+	static final int RIGHT = 1;
+	
+	static final String PARENTHESES = "()";
+	static final String CURLY = "{}";
+	static final String SQUARE = "[]";
+	
+	static final Map<Character, Integer> brackets;
+	
+	static {
+		brackets = Map.of(
+				'(', 1,
+				')', 2,
+				'{', 3,
+				'}', 4,
+				'[', 5,
+				']', 6
+				);
+	}
 	
 	static int testCase;
 	static int number;
-	static int[] dp;
+	static String[] dp;
 	
 	public static void main(String[] args) throws Exception {
 		br = new BufferedReader(new InputStreamReader(System.in));
@@ -25,125 +41,80 @@ public class Main {
 		while (testCase-- > 0) {
 			number = Integer.parseInt(br.readLine().trim());
 			
-			sb.append(changeToString(dp[number])).append("\n");
+			sb.append(dp[number]).append("\n");
 		}
 		
 		System.out.println(sb);
 	}
 	
-	private static String changeToString(int value) {
-		String result = "";
-		
-		while (value > 0) {
-			int num = value % 10;
-			
-			if (num == PARENTHESES[0]) {
-				result = '(' + result;
-			}
-			else if (num == PARENTHESES[1]) {
-				result = ')' + result;
-			}
-			else if (num == CURLY[0]) {
-				result = '{' + result;
-			}
-			else if (num == CURLY[1]) {
-				result = '}' + result;
-			}
-			else if (num == SQUARE[0]) {
-				result = '[' + result;
-			}
-			else if (num == SQUARE[1]) {
-				result = ']' + result;
-			}
-			
-			value /= 10;
-		}
-		
-		return result;
-	}
-	
 	private static void init() {
-		dp = new int[MAX+1];
-		Arrays.fill(dp, Integer.MAX_VALUE);
-		dp[1] = getValueOfBracket(PARENTHESES);
-		dp[2] = getValueOfBracket(CURLY);
-		dp[3] = getValueOfBracket(SQUARE);
+		dp = new String[MAX + 1];
+		Arrays.fill(dp, null);
+		dp[1] = PARENTHESES;
+		dp[2] = CURLY;
+		dp[3] = SQUARE;
 		
 		for (int idx = 2; idx <= MAX; idx++) {
-			// [idx-1] + 1
-			dp[idx] = Math.min(dp[idx], getAdditionValue(idx, 1, PARENTHESES));
+			// +1
+			dp[idx] = getMinValue(dp[idx], getAddition(idx-1, PARENTHESES));
 			
-			// [idx-2] + 2
-			dp[idx] = Math.min(dp[idx], getAdditionValue(idx, 2, CURLY));
+			// +2
+			dp[idx] = getMinValue(dp[idx], getAddition(idx-2, CURLY));
 			
-			// [idx-3] + 3
-			dp[idx] = Math.min(dp[idx], getAdditionValue(idx, 3, SQUARE));
+			// +3
+			dp[idx] = getMinValue(dp[idx], getAddition(idx-3, SQUARE));
 			
-			// [idx/2] * 2
-			dp[idx] = Math.min(dp[idx], getMultipleValue(idx, 2, PARENTHESES));
+			// *2
+			dp[idx] = getMinValue(dp[idx], getMultiple(idx, 2, PARENTHESES));
 			
-			// [idx/3] * 3
-			dp[idx] = Math.min(dp[idx], getMultipleValue(idx, 3, CURLY));
+			// *3
+			dp[idx] = getMinValue(dp[idx], getMultiple(idx, 3, CURLY));
 			
-			// [idx/5] * 5
-			dp[idx] = Math.min(dp[idx], getMultipleValue(idx, 5, SQUARE));
+			// *5
+			dp[idx] = getMinValue(dp[idx], getMultiple(idx, 5, SQUARE));
 		}
 	}
 	
-	private static int getAdditionValue(int index, int add, int[] brackets) {
-		if (index - add < 1) {
-			return Integer.MAX_VALUE;
+	private static String getAddition(int curIdx, String bracket) {
+		if (curIdx <= 0) {
+			return null;
 		}
 		
-		int curValue = dp[index - add];
-		int addValue = getValueOfBracket(brackets);
+		String curStr = dp[curIdx];
+		String addStr = bracket;
 		
-		// sum과 curValue의 상위 두 자리를 비교하여 위치 순서 결정
-		if (isSmaller(addValue, curValue)) {
-			int digit = getDigitOfNum(curValue);
-			
-			return addValue * (int) Math.pow(10, digit) + curValue;
-		}
-		
-		return curValue * 100 + addValue;
+		return getMinValue(curStr+addStr, addStr+curStr);
 	}
 	
-	private static int getMultipleValue(int index, int multiple, int[] brackets) {
-		if (index % multiple != 0) {
-			return Integer.MAX_VALUE;
+	private static String getMultiple(int curIdx, int denominator, String bracket) {
+		if (curIdx % denominator != 0) {
+			return null;
 		}
 		
-		int digit = getDigitOfNum(dp[index / multiple]);		
+		String curStr = dp[curIdx / denominator];
 		
-		return brackets[0] * (int) Math.pow(10, digit+1) + dp[index/multiple] * 10 + brackets[1];
+		return bracket.charAt(0) + curStr + bracket.charAt(1);
 	}
 	
-	private static boolean isSmaller(int base, int cmp) {
-		int baseDigit = getDigitOfNum(base);
-		int cmpDigit = getDigitOfNum(cmp);
-		
-		if (baseDigit < cmpDigit) {
-			base *= Math.pow(10, cmpDigit-baseDigit);
+	private static String getMinValue(String str1, String str2) {
+		if (str1 == null) {
+			return str2;
 		}
-		else if (baseDigit > cmpDigit) {
-			cmp *= Math.pow(10, baseDigit-cmpDigit);
+		else if (str2 == null) {
+			return str1;
 		}
 		
-		return base < cmp;
-	}
-	
-	private static int getDigitOfNum(int number) {
-		int digit = 0;
-		
-		while (number > 0) {
-			number /= 10;
-			++digit;
+		if (str1.length() == str2.length()) {
+			for (int idx = 0; idx < str1.length(); idx++) {
+				int value1 = brackets.get(str1.charAt(idx));
+				int value2 = brackets.get(str2.charAt(idx));
+				
+				if (value1 == value2) continue;
+				
+				return (value1 < value2) ? str1 : str2;
+			}
 		}
 		
-		return digit;
-	}
-	
-	private static int getValueOfBracket(int[] brackets) {
-		return 10 * brackets[0] + brackets[1];
+		return (str1.length() < str2.length()) ? str1 : str2;
 	}
 }
