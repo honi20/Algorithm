@@ -55,14 +55,9 @@ public class Main {
 		dp[3] = SQUARE;
 		
 		for (int idx = 2; idx <= MAX; idx++) {
-			// +1
-			dp[idx] = getMinValue(dp[idx], getAddition(idx-1, PARENTHESES));
-			
-			// +2
-			dp[idx] = getMinValue(dp[idx], getAddition(idx-2, CURLY));
-			
-			// +3
-			dp[idx] = getMinValue(dp[idx], getAddition(idx-3, SQUARE));
+			for (int pre = 1; pre < idx; pre++) {
+				dp[idx] = getMinValue(dp[idx], getAddition(dp[pre], dp[idx-pre]));
+			}
 			
 			// *2
 			dp[idx] = getMinValue(dp[idx], getMultiple(idx, 2, PARENTHESES));
@@ -75,15 +70,8 @@ public class Main {
 		}
 	}
 	
-	private static String getAddition(int curIdx, String bracket) {
-		if (curIdx <= 0) {
-			return null;
-		}
-		
-		String curStr = dp[curIdx];
-		String addStr = bracket;
-		
-		return getMinValue(curStr+addStr, addStr+curStr);
+	private static String getAddition(String str1, String str2) {
+		return getMinValue(str1+str2, str2+str1);
 	}
 	
 	private static String getMultiple(int curIdx, int denominator, String bracket) {
