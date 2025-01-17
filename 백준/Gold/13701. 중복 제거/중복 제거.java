@@ -8,7 +8,6 @@
  * 	   - arr[0] -> 0 ~ 31 (0*32 <= val < 1*32)
  *     - arr[1] -> 32 ~ 63 (1*32 <= val < 2*32)
  *     - ...
- * 
  */
 import java.io.*;
 import java.util.*;
@@ -26,9 +25,9 @@ public class Main {
 		
 		arr = new int[1 << 20];
 		
-		String[] input = br.readLine().trim().split(" ");
-		for (int idx = 0; idx < input.length; idx++) {
-			int num = Integer.parseInt(input[idx]);
+		st = new StringTokenizer(br.readLine().trim());
+		while (st.hasMoreTokens()) {
+			int num = Integer.parseInt(st.nextToken());
 			int arr_idx = num / 32;
 			int bits_idx = num % 32;
 					
