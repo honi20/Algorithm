@@ -6,22 +6,25 @@ public class Main {
 	static StringBuilder sb;
 	static StringTokenizer st;
 
-	static Set<Integer> numbers;
+	static final int MAX = 33_554_432;
+	
+	static boolean[] isInput;
 	
 	public static void main(String[] args) throws Exception {
 		br = new BufferedReader(new InputStreamReader(System.in));
 		sb = new StringBuilder();
 		
-		numbers = new HashSet<>();
+		isInput = new boolean[MAX];
+		Arrays.fill(isInput, false);
 		
 		String[] input = br.readLine().trim().split(" ");
 		for (int idx = 0; idx < input.length; idx++) {
 			int num = Integer.parseInt(input[idx]);
 			
 			// set에 포함되었는지 확인
-			if (!numbers.contains(num)) {
+			if (!isInput[num]) {
 				sb.append(num).append(" ");
-				numbers.add(num);
+				isInput[num] = true;
 			}
 		}
 		
