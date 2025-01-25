@@ -29,6 +29,7 @@ public class Main {
 		// runner가 집에 도착하기 위해 이동해야 하는 최소 횟수 탐색
 		long movingCnt = getRunnerMovingCnt();
 		
+		// 아예 집 도착이 불가능한 경우
 		if (movingCnt == -1L) {
 			sb.append(-1);
 		}
@@ -49,7 +50,7 @@ public class Main {
 
 	private static long getRunnerMovingCnt() {
 		long start = 0L;
-		long end = decreaseDist == 0L ? (long)Math.ceil((double)runnerPos/runnerDist) : getMaxCnt();
+		long end = getMaxCnt();
 		long cnt = -1L;
 
 		while (start <= end) {
@@ -73,6 +74,10 @@ public class Main {
 	}
 	
 	private static long getMaxCnt() {
+		if (decreaseDist == 0) {
+			return (long)Math.ceil((double)runnerPos/runnerDist);
+		}
+		
 		return (long)Math.floor((double)runnerDist / decreaseDist) + 1L;
 	}
 	
