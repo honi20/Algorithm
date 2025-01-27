@@ -40,24 +40,24 @@ public class Main {
 
 	static int maxParticapant;
 	static PriorityQueue<Point> queue;
-	static int[] minCost;
+	static long[] minCost;
 
 	public static void main(String[] args) throws Exception {
 		input();
 
 		queue = new PriorityQueue<>();
-		minCost = new int[crossCnt+1];
+		minCost = new long[crossCnt+1];
 		System.out.println(solve());
 	}
 
-	private static int solve() {
+	private static long solve() {
 		// 마라톤 참가 인원수를 이분 탐색을 통해 구한다.
-		int start = 0;
-		int end = maxParticapant;
-		int result = -1;
+		long start = 0;
+		long end = maxParticapant;
+		long result = -1;
 		
 		while (start < end) {
-			int mid = (start + end) / 2;
+			long mid = (start + end) / 2;
 
 			if (isPossible(mid)) {
 				result = mid;
@@ -70,7 +70,7 @@ public class Main {
 		return result;
 	}
 
-	private static boolean isPossible(int participantCnt) {
+	private static boolean isPossible(long participantCnt) {
 		queue.clear();
 		Arrays.fill(minCost, -1);
 		
@@ -97,7 +97,7 @@ public class Main {
 				Road road = list.get(idx);
 				
 				// 인접 교차로에 가는데 필요한 비용을 파악한다.
-				int nextCost = getCost(participantCnt, road);
+				long nextCost = getCost(participantCnt, road);
 				
 				// 예산을 초과하는 경로인 경우, 패스 
 				if (curCost + nextCost > budget) {
@@ -107,7 +107,7 @@ public class Main {
 				// 이미 더 적은 비용으로 가는 경로가 있는 경우, 패스
 				if (minCost[road.cross] == -1 || curCost + nextCost < minCost[road.cross]) {
 					minCost[road.cross] = curCost + nextCost;
-					queue.add(new Point(road.cross, minCost[road.cross]));
+					queue.add(new Point(road.cross, (int)minCost[road.cross]));
 				}
 			}
 		}
@@ -115,12 +115,12 @@ public class Main {
 		return false;
 	}
 
-	private static int getCost(int participantCnt, Road road) {
+	private static long getCost(long participantCnt, Road road) {
 		if (participantCnt <= road.limit) {
 			return 0;
 		}
 		
-		return road.cost * (int)Math.pow((participantCnt-road.limit), 2);
+		return road.cost * (long)Math.pow((participantCnt-road.limit), 2);
 	}
 	
 	private static void input() throws Exception {
