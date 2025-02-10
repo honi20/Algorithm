@@ -47,10 +47,12 @@ public class Main {
 			int val1 = Integer.parseInt(st.nextToken());
 			int val2 = Integer.parseInt(st.nextToken());
 			
+			// 수열 값 변경 후 업데이트
 			if (type == 1) {
 				arr[val1] = val2;
 				update(1, 1, arrSize, new Node(val1, val2));
 			}
+			// 범위 내 최소값을 갖는 인덱스
 			else if (type == 2) {
 				Node ans = query(1, 1, arrSize, val1, val2);
 				sb.append(ans.index).append("\n");
@@ -60,6 +62,7 @@ public class Main {
 		System.out.println(sb);
 	}
 	
+	// 범위 내 최소값을 갖는 노드 정보 반환
 	private static Node query(int node, int start, int end, int left, int right) {
 		if (left > end || right < start) {
 			return null;
@@ -75,17 +78,13 @@ public class Main {
 				
 	}
 	
+	// 값 변경에 따른 트리 갱신
 	private static void update(int node, int start, int end, Node newNode) {
 		if (newNode.index < start || end < newNode.index) {
 			return;
 		}
 		
-		if (tree[node].index == newNode.index) {
-			tree[node] = newNode;
-		}
-		else {
-			tree[node] = getMin(tree[node], newNode);
-		}
+		tree[node] = newNode;
 		
 		if (start != end) {
 			int mid = (start+end) / 2;
@@ -95,6 +94,7 @@ public class Main {
 		}
 	}
 	
+	// 세그먼트 트리 초기화
 	private static Node init(int node, int start, int end) {
 		if (start == end) {
 			return tree[node] = new Node(start, arr[start]);
