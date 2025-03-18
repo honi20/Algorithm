@@ -25,47 +25,47 @@ public class Main {
 			arr[idx] = Integer.parseInt(st.nextToken());
 		}
 
+		// tree 초기화
 		init();
 
 		st = new StringTokenizer(br.readLine().trim());
 		while (st.hasMoreTokens()) {
-			int ballNum = Integer.parseInt(st.nextToken());
-			
+			int memberNum = Integer.parseInt(st.nextToken());
+
 			// 공 번호 탐색
-			sb.append(query(1, 1, arrSize, 1, tree[1], ballNum)).append(" ");
+			sb.append(query(1, 1, arrSize, 1, tree[1], memberNum)).append(" ");
 
 			// 당첨 회원의 공 삭제
-			update(1, 1, arrSize, ballNum, arr[ballNum]);
+			update(1, 1, arrSize, memberNum);
 		}
-		
+
 		System.out.println(sb);
 	}
 
-	private static int query(int node, int start, int end, int left, int right, int ballNum) {
+	private static int query(int node, int start, int end, int left, int right, int index) {
 		if (start == end) {
 			return left;
 		}
 
 		int mid = (start + end) / 2;
-		if (ballNum <= mid) {
-			return query(node * 2, start, mid, left, left + tree[node * 2] - 1, ballNum);
-		} 
-		else {
-			return query(node * 2 + 1, mid + 1, end, left + tree[node * 2], right, ballNum);
+		if (index <= mid) {
+			return query(node * 2, start, mid, left, left + tree[node * 2] - 1, index);
+		} else {
+			return query(node * 2 + 1, mid + 1, end, left + tree[node * 2], right, index);
 		}
 	}
 
-	private static void update(int node, int start, int end, int ballNum, int value) {
-		if (ballNum > end || ballNum < start) {
+	private static void update(int node, int start, int end, int index) {
+		if (index > end || index < start) {
 			return;
 		}
 
-		tree[node] -= value;
+		tree[node] -= arr[index];
 
 		if (start != end) {
 			int mid = (start + end) / 2;
-			update(node * 2, start, mid, ballNum, value);
-			update(node * 2 + 1, mid + 1, end, ballNum, value);
+			update(node * 2, start, mid, index);
+			update(node * 2 + 1, mid + 1, end, index);
 		}
 	}
 
