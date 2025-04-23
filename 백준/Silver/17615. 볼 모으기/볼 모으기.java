@@ -14,17 +14,36 @@ public class Main {
 		String str = br.readLine().trim();
 		
 		int result = Integer.MAX_VALUE;
-		result = Math.min(result, solve('R', 'B', N, str));
-		result = Math.min(result, solve('B', 'R', N, str));
+		result = Math.min(result, solveFront('R', 'B', N, str));
+		result = Math.min(result, solveFront('B', 'R', N, str));
+		result = Math.min(result, solveBack('R', 'B', N, str));
+		result = Math.min(result, solveBack('B', 'R', N, str));
 		
 		System.out.println(result);
 	}
 	
-	private static int solve(int baseColor, int otherColor, int N, String str) {
+	private static int solveBack(int baseColor, int otherColor, int N, String str) {
 		boolean isFirst = true;
 		int cnt = 0;
 		
 		for (int idx = N - 1; idx >= 0; idx--) {
+			if (isFirst && str.charAt(idx) == otherColor) {
+				isFirst = false;
+			}
+			
+			if (!isFirst && str.charAt(idx) == baseColor) {
+				++cnt;
+			}
+		}
+		
+		return cnt;
+	}
+	
+	private static int solveFront(int baseColor, int otherColor, int N, String str) {
+		boolean isFirst = true;
+		int cnt = 0;
+		
+		for (int idx = 0; idx < N; idx++) {
 			if (isFirst && str.charAt(idx) == otherColor) {
 				isFirst = false;
 			}
