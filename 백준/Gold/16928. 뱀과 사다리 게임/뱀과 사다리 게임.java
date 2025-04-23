@@ -83,7 +83,7 @@ public class Main {
 				break;
 			}
 			
-			// 뱀이 있는 칸인 경우, 패스
+			// 뱀이 있는 칸인 경우
 			if (map[next] == SNAKE) {
 				if (minMap[next] > curCnt + 1) {
 					minMap[next] = curCnt + 1;
