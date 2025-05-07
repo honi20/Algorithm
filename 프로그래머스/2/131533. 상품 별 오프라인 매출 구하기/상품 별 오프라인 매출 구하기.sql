@@ -15,11 +15,8 @@
 # left join product on sale.product_id = product.product_id
 # ;
 
-select product_code, SUM(sales) as 'sales'
-from (
-    select product_code, sales_amount*price as 'sales'
-    from offline_sale sale
-    left join product on sale.product_id = product.product_id
-) sales_of_product
+select product_code, SUM(sale.sales_amount * product.price) as 'sales'
+from offline_sale sale
+left join product on sale.product_id = product.product_id
 group by product_code
 ORDER BY sales DESC, product_code;
