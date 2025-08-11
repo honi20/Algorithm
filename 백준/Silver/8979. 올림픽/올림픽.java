@@ -74,7 +74,7 @@ public class Main {
                 }
                 else {
                     curScore += cnt;
-                    cnt = 0;
+                    cnt = 1;
                 }
             }
 
