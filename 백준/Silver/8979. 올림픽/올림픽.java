@@ -13,6 +13,7 @@ public class Main {
         int copper;
 
         public Country(int num, int gold, int silver, int copper) {
+            this.num = num;
             this.gold = gold;
             this.silver = silver;
             this.copper = copper;
@@ -58,14 +59,13 @@ public class Main {
 
         Collections.sort(countries);
 
-        int[] score = new int[countryCnt + 1];
         int cnt = 0;
         int curScore = 1;
         for (int idx = 0; idx < countryCnt; idx++) {
             Country country = countries.get(idx);
-
+            
             if (idx == 0) {
-                score[country.num] = curScore;
+                ++cnt;
             }
             else {
                 // 이전 나라와 점수가 같은 경우
